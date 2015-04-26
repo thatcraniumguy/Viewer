@@ -1,0 +1,45 @@
+-- Viewer GUI API
+-- Used for drawing the GUI
+
+settings = {}
+
+function getSettings()
+    -- Retrieve settings from saved file, or if none exists, create settings from default list
+    local defaultSettings = {
+        menuBarColor = colors.red,
+        menuTextColor = colors.blue,
+        menuLocation = "top"
+        backgroundColor = colors.black,
+        textColor = colors.white
+        }
+    if not fs.exists("viewerGUI.cfg") then
+        local file = fs.open("viewerGUI.cfg", "w")
+        file.write(texutils.serialize(defaultSettings))
+        file.close()
+    else
+        local file = fs.open("viewerGUI.cfg", "r")
+        local content = file.read()
+        settings = textutils.unserialize(content)
+    end
+end
+
+function clearScreen()
+    -- Clear the current screen, wiping for complete redraw
+    term.setBackgroundColor(colors.black)
+    term.clear()
+end
+
+local function drawMenuBar()
+    -- Draw the single line menu bar
+    term.setCursorPos(1,1)
+    term.setBackgroundColor(colors.red)
+    
+end
+
+function drawScreen(list)
+    -- Main GUI assembly
+    settings = gui.getSettings()
+    clearScreen()
+    drawMenuBar(list)
+    
+end
