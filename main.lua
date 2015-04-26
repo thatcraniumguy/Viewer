@@ -2,14 +2,25 @@
 -- A comprehensive peripheral visualizer for Minecraft
 version = 0.01
 
+-- Load bundled APIs
+os.loadAPI("gui")
+
+-- Clear log files
+if fs.exists("viewer.log") then
+    fs.delete ("viewer.log")
+end
+
+-- Debug tool
+local function logFile(input)
+    local file = fs.open("viewer.log", "a")
+    file.write(input)
+    file.close()
+end
+
 function getSettings()
     -- Retrieve settings from saved file, or if none exists, create settings from default list
     local defaultSettings = {
-        menuBarColor = colors.red,
-        menuTextColor = colors.blue,
-        menuLocation = "top"
-        backgroundColor = colors.black,
-        textColor = colors.white
+        
         }
     if not fs.exists("viewer.cfg") then
         local file = fs.open("viewer.cfg", "w")
@@ -22,10 +33,8 @@ function getSettings()
     end
 end
 
-settings = getSettings()
-
-local pList = {}
 function getList()
+    pList = {}
     for num,pName in ipairs(peripheral.getNames()) do
         local p = peripheral.wrap(pName)
         pList[num] = {
@@ -45,6 +54,11 @@ function getList()
             }
     end
 end
+
+settings = getSettings()
+gui.drawScreen()
+
+-------------------------------------------------------------------
 local function printPeripheralTable()
     local file = fs.open("dump", "w")
     file.write(textutils.serialize(pList))
