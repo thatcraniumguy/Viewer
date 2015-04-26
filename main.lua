@@ -1,5 +1,6 @@
 -- Viewer
 -- A comprehensive peripheral visualizer for Minecraft
+version = 0.01
 
 local pList = {}
 function getList()
