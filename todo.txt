@@ -1,8 +1,0 @@
-Todo:
-Create framework for splitting different peripherals into their own API
-    Create a way for each peripheral type to have their own table for peripheral calls?
-Design basic GUI for the main program
-    Main layout
-    GUI API?
-    Logo?
-Create code for mapping peripherals and sorting/categorizing them
