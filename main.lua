@@ -12,6 +12,21 @@ end
 
 function populateList(list)
     for i,v in pairs(list) do
-        
+        --[[peripherals = {
+            {
+                name = peripheral.getNames()
+                type = peripheral.getType()
+                inventory = {
+                    name = getInventoryName()
+                    max = getInventorySize()
+                    stored = getAllStacks()
+                }
+                energy = {
+                    max = getMaxEnergyStored()
+                    stored = getEnergyStored()
+                methods = getAdvancedMethodsData()
+                }
+            }
+        }]]
     end
 end
