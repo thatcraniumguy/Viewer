@@ -1,5 +1,6 @@
 -- Viewer GUI API
 -- Used for drawing the GUI
+version = 0.01
 
 settings = {}
 
@@ -13,13 +14,17 @@ function getSettings()
         textColor = colors.white
         }
     if not fs.exists("viewerGUI.cfg") then
+        logfile("GUI settings not found")
         local file = fs.open("viewerGUI.cfg", "w")
         file.write(texutils.serialize(defaultSettings))
         file.close()
+        logfile("Using default settings")
     else
+        logfile("GUI settings found")
         local file = fs.open("viewerGUI.cfg", "r")
         local content = file.read()
         settings = textutils.unserialize(content)
+        logfile("GUI settings loaded")
     end
 end
 
@@ -39,7 +44,7 @@ end
 function drawScreen(list)
     -- Main GUI assembly
     settings = gui.getSettings()
-    clearScreen()
-    drawMenuBar(list)
+    --clearScreen()
+    --drawMenuBar(list)
     
 end
