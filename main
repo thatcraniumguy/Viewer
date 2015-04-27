@@ -70,15 +70,9 @@ end
 
 -- Load bundled APIs
 os.loadAPI("settings")
+os.loadAPI("gui")
 
 ----------------
 -- DEBUG CODE --
 ----------------
-local function printPeripheralTable()
-    local file = fs.open("dump", "w")
-    file.write(textutils.serialize(pList))
-    file.close()
-    print("Peripheral list dumped!")
-end
 getList()
-printPeripheralTable()
