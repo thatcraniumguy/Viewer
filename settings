@@ -3,14 +3,14 @@
 
 
 main = {
-    version = 0.01
+    version = 0.01,
     safeShutdown = false
     }
 gui = {
     version = 0.01,
     menuBarColor = colors.red,
     menuTextColor = colors.blue,
-    menuLocation = "top"
+    menuLocation = "top",
     backgroundColor = colors.black,
     textColor = colors.white
     }
