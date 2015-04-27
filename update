@@ -1,17 +1,17 @@
 -- Viewer installer/updater
 -- Connects to GitHub to retrieve the latest version available
 
+-- Clear log files
+if fs.exists("/logs/viewerUpdater.log") then
+    fs.delete ("/logs/viewerUpdater.log")
+end
+
 --Check filesystem dependencies
 if not fs.exists("/logs") then
     fs.mkdir("/logs")
 end
 if not fs.exists("/temp") then
     fs.mkdir("/temp")
-end
-
--- Clear log files
-if fs.exists("/logs/viewerUpdater.log") then
-    fs.delete ("/logs/viewerUpdater.log")
 end
 
 -- Debug tool
@@ -22,32 +22,44 @@ local function logfile(input)
 end
 
 -- Installer code
-local filenames = {
+local files = {
     "gui"
     "main"
     "install"
     "settings"
     }
 
+logfile("Updater started, checking for updates for "..#files.." files")
 if not http then
     logfile("HTTP API not enabled! Please enable the HTTP API in the ComputerCraft config file, or ask your server administrator to do so.")
     print("HTTP API not enabled! Please enable the HTTP API in\nthe ComputerCraft config file, or ask your server/nadministrator to do so.")
     return
 else
     for i,filename in pairs(files) do
+        logfile("Checking for updates for '"..filename"':")
         local file = fs.open(filename, "w")
         local site = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
         local content = site.readAll()
         if not content then 
-            logfile("No response from GitHub. Please check the ComputerCraft config and ensure that the GitHub url has been whitelisted.")
+            logfile("    No response from GitHub. Please check the ComputerCraft config and ensure that the GitHub url has been whitelisted.")
             print("No response from GitHub. Please check the\nComputerCraft config and ensure that the GitHub url\nhas been whitelisted.")
             return
         else
-            logfile("Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
-            
-            -- Check for existing files
-            
+            logfile("    Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
+            local tempFile = fs.open("/temp/new_settings", "w")
+            local tempSite = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/settings").readAll()
+            tempFile.write(tempSite)
+            tempFile.close()
+            os.loadAPI("new_settings")
+            if new_settings[filename].version > settings[filename].version then
+                logfile("    Newer version found for ,"..filename.."'.\n        Current version: "..settings[filename].version.."\n        New version: "..new_settings[filename].version)
+                file.write(content)
+                file.close()
+                logfile("    Updated!")
+            else
+                logfile("    No new version found for '"..filename"'")
+            end
         end
     end
 end
-logfile("Update complete")
+logfile("Updater completed checking for updates")
