@@ -8,25 +8,25 @@ end
 
 --Check filesystem dependencies
 if not fs.exists("/logs") then
-    fs.mkdir("/logs")
+    fs.makeDir("/logs")
 end
 if not fs.exists("/temp") then
-    fs.mkdir("/temp")
+    fs.makeDir("/temp")
 end
 
 -- Debug tool
 local function logfile(input)
     local file = fs.open("/logs/viewerUpdater.log", "a")
-    file.write(input)
+    file.write(input.."\n")
     file.close()
 end
 
 -- Installer code
 local files = {
-    "gui"
-    "main"
-    "install"
-    "settings"
+    "main",
+    "gui",
+    "update",
+    --"settings",
     }
 
 logfile("Updater started, checking for updates for "..#files.." files")
@@ -35,31 +35,59 @@ if not http then
     print("HTTP API not enabled! Please enable the HTTP API in\nthe ComputerCraft config file, or ask your server/nadministrator to do so.")
     return
 else
-    for i,filename in pairs(files) do
-        logfile("Checking for updates for '"..filename"':")
-        local file = fs.open(filename, "w")
-        local site = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
+    logfile("Checking for settings.")
+    if not fs.exists("settings") then
+        logfile("Settings not found!")
+        local file = fs.open("settings", "w")
+        local site = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/settings")
         local content = site.readAll()
-        if not content then 
-            logfile("    No response from GitHub. Please check the ComputerCraft config and ensure that the GitHub url has been whitelisted.")
-            print("No response from GitHub. Please check the\nComputerCraft config and ensure that the GitHub url\nhas been whitelisted.")
+        if not content then
+            logfile("No response from GitHub. Please check the ComputerCraft config and ensure that the GitHub url has been whitelisted.")
             return
         else
-            logfile("    Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
-            local tempFile = fs.open("/temp/new_settings", "w")
-            local tempSite = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/settings").readAll()
-            tempFile.write(tempSite)
-            tempFile.close()
-            os.loadAPI("new_settings")
-            if new_settings[filename].version > settings[filename].version then
-                logfile("    Newer version found for ,"..filename.."'.\n        Current version: "..settings[filename].version.."\n        New version: "..new_settings[filename].version)
-                file.write(content)
-                file.close()
-                logfile("    Updated!")
+            file.write(content)
+            file.close()
+            logfile("Settings retrieved from GitHub successfully")
+        end
+    end
+    logfile("Loading settings into API")
+    os.loadAPI("settings")
+    if filename ~= "settings" then
+        for i,filename in pairs(files) do
+            logfile("Checking for updates for '"..filename.."':")
+            local site = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename)
+            local content = site.readAll()
+            if not content then 
+                logfile("    No response from GitHub. Please check the ComputerCraft config and ensure that the GitHub url has been whitelisted.")
+                print("No response from GitHub. Please check the\nComputerCraft config and ensure that the GitHub url\nhas been whitelisted.")
+                return
             else
-                logfile("    No new version found for '"..filename"'")
+                logfile("    Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename)
+                local tempFile = fs.open("/temp/new_settings", "w")
+                local tempSite = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/settings").readAll()
+                tempFile.write(tempSite)
+                tempFile.close()
+                os.loadAPI("/temp/new_settings")
+                print(new_settings[filename].version.."->"..settings[filename].version)
+                if not fs.exists(filename) then
+                    logfile("    No file found for '"..filename.."'!\n    Downloading file now...")
+                    local file = fs.open(filename, "w")
+                    file.write(content)
+                    file.close()
+                    logfile("    Downloaded!")
+                elseif new_settings[filename].version > settings[filename].version then
+                    logfile("    Newer version found for ,"..filename.."'.\n        Current version: "..settings[filename].version.."\n        New version: "..new_settings[filename].version)
+                    local file = fs.open(filename, "w")
+                    file.write(content)
+                    file.close()
+                    logfile("    Updated!")
+                else
+                    logfile("    No new version found for '"..filename.."', skipping.")
+                end
             end
         end
+    else
+        -- Load current settings, download update, then try to merge them somehow
     end
 end
 logfile("Updater completed checking for updates")
