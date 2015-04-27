@@ -1,14 +1,17 @@
 -- Viewer installer/updater
 -- Connects to GitHub to retrieve the latest version available
-version = 0.01
 
--- Clear log files
+--Check filesystem dependencies
 if not fs.exists("/logs") then
     fs.mkdir("/logs")
-else
-    if fs.exists("/logs/viewerUpdater.log") then
-        fs.delete ("/logs/viewerUpdater.log")
-    end
+end
+if not fs.exists("/temp") then
+    fs.mkdir("/temp")
+end
+
+-- Clear log files
+if fs.exists("/logs/viewerUpdater.log") then
+    fs.delete ("/logs/viewerUpdater.log")
 end
 
 -- Debug tool
@@ -23,6 +26,7 @@ local filenames = {
     "gui"
     "main"
     "install"
+    "settings"
     }
 
 if not http then
@@ -40,18 +44,10 @@ else
             return
         else
             logfile("Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
-            -- Check current version versus online version
-            local tempFile = fs.open(filename[i].."_temp", "w")
-            tempFile.close()
-            logfile("Loading "..filename[i].." as an API, 'cuz I don't know how to do this otherwise...")
-            os.loadAPI(filename[i].."_temp")
-            if filename_temp.version < filename[i].version then
-                fs.move("/"..filename[i].."_temp", "/"..filename[i])
-                logfile("File saved at "..filename[i])
-            else
-                logfile("No new version for "..filename[i])
-            end
-            os.unloadAPI(filename[i].."_temp")
+            
+            -- Check for existing files
+            
         end
     end
 end
+logfile("Update complete")
