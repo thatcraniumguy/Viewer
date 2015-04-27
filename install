@@ -3,8 +3,12 @@
 version = 0.01
 
 -- Clear log files
-if fs.exists("/logs/viewerUpdater.log") then
-    fs.delete ("/logs/viewerUpdater.log")
+if not fs.exists("/logs") then
+    fs.mkdir("/logs")
+else
+    if fs.exists("/logs/viewerUpdater.log") then
+        fs.delete ("/logs/viewerUpdater.log")
+    end
 end
 
 -- Debug tool
@@ -17,8 +21,8 @@ end
 -- Installer code
 local filenames = {
     gui
-    main.lua
-    install.lua
+    main
+    install
     }
 
 if not http then
@@ -36,9 +40,18 @@ else
             return
         else
             logfile("Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
-            file.write(content)
-            file.close()
-            logfile("File saved at "..filename)
+            -- Check current version versus online version
+            local tempFile = fs.open(filename.."_temp", "w")
+            tempFile.close()
+            logfile("Loading "..filename.." as an API, 'cuz I don't know how to do this otherwise...")
+            os.loadAPI(filename.."_temp")
+            if filename_temp.version < filename.version then
+                fs.move("/"..filename.."_temp", "/"..filename)
+                logfile("File saved at "..filename)
+            else
+                logfile("No new version for "..filename)
+            end
+            os.unloadAPI(filename.."_temp")
         end
     end
 end
