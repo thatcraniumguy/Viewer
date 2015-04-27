@@ -20,9 +20,9 @@ end
 
 -- Installer code
 local filenames = {
-    gui
-    main
-    install
+    "gui"
+    "main"
+    "install"
     }
 
 if not http then
@@ -41,17 +41,17 @@ else
         else
             logfile("Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename[i])
             -- Check current version versus online version
-            local tempFile = fs.open(filename.."_temp", "w")
+            local tempFile = fs.open(filename[i].."_temp", "w")
             tempFile.close()
-            logfile("Loading "..filename.." as an API, 'cuz I don't know how to do this otherwise...")
-            os.loadAPI(filename.."_temp")
-            if filename_temp.version < filename.version then
-                fs.move("/"..filename.."_temp", "/"..filename)
-                logfile("File saved at "..filename)
+            logfile("Loading "..filename[i].." as an API, 'cuz I don't know how to do this otherwise...")
+            os.loadAPI(filename[i].."_temp")
+            if filename_temp.version < filename[i].version then
+                fs.move("/"..filename[i].."_temp", "/"..filename[i])
+                logfile("File saved at "..filename[i])
             else
-                logfile("No new version for "..filename)
+                logfile("No new version for "..filename[i])
             end
-            os.unloadAPI(filename.."_temp")
+            os.unloadAPI(filename[i].."_temp")
         end
     end
 end
