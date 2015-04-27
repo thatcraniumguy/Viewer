@@ -6,8 +6,12 @@ version = 0.01
 os.loadAPI("gui")
 
 -- Clear log files
-if fs.exists("/logs/viewer.log") then
-    fs.delete ("/logs/viewer.log")
+if not fs.exists("/logs") then
+    fs.mkdir("/logs")
+else
+    if fs.exists("/logs/viewer.log") then
+        fs.delete ("/logs/viewer.log")
+    end
 end
 
 -- Debug tool
