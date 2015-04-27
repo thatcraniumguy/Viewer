@@ -1,44 +1,30 @@
 -- Viewer
 -- A comprehensive peripheral visualizer for Minecraft
-version = 0.01
-
--- Load bundled APIs
-os.loadAPI("gui")
-
--- Clear log files
-if not fs.exists("/logs") then
-    fs.mkdir("/logs")
-else
-    if fs.exists("/logs/viewer.log") then
-        fs.delete ("/logs/viewer.log")
-    end
-end
 
 -- Debug tool
 local function logfile(input)
-    local file = fs.open("/logs/viewer.log", "a")
-    file.write(input)
-    file.close()
+    if not fs.exists("/logs") then
+        fs.mkdir("/logs")
+    else
+        local file = fs.open("/logs/viewer.log", "a")
+        file.write(input)
+        file.close()
+    end
 end
 
 function getSettings()
     -- Retrieve settings from saved file, or if none exists, create settings from default list
-    local defaultSettings = {
-        safeShutdown = false
-        }
-    if not fs.exists("viewer.cfg") then
+    if not fs.exists("settings") then
+        -- Retrieve up to date settings from GitHub
         logfile("Main settings not found!")
-        local file = fs.open("viewer.cfg", "w")
-        file.write(texutils.serialize(defaultSettings))
-        file.close()
-        logfile("Using default settings")
+        logfile("Using default settings; Running updater")
+        shell.run("install")
     else
         logfile("Main settings found!")
-        local file = fs.open("viewer.cfg", "r")
-        local content = file.read()
-        settings = textutils.serialize(content)
-        logfile("Main settings loaded")
     end
+    -- Load settings
+    os.loadAPI("settings")
+    logfile("Main settings loaded")
 end
 
 function getList()
@@ -64,10 +50,30 @@ function getList()
             }
     end
 end
+-------------------------
+-- Main code execution --
+-------------------------
+-- Clear log files
+if not fs.exists("/logs") then
+    fs.mkdir("/logs")
+else
+    if fs.exists("/logs/viewer.log") then
+        fs.delete ("/logs/viewer.log")
+    end
+end
+-- Check for dependencies
+if not http then
+    logfile("HTTP API not enabled! Please enable the HTTP API in the ComputerCraft config file, or ask your server administrator to do so.")
+    print("HTTP API not enabled! Please enable the HTTP API in\nthe ComputerCraft config file, or ask your server/nadministrator to do so.")
+    return
+end
 
-gui.drawScreen()
+-- Load bundled APIs
+os.loadAPI("settings")
 
--------------------------------------------------------------------
+----------------
+-- DEBUG CODE --
+----------------
 local function printPeripheralTable()
     local file = fs.open("dump", "w")
     file.write(textutils.serialize(pList))
