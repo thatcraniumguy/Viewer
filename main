@@ -29,10 +29,9 @@ end
 
 local function getList()
     local pList = {}
+    logfile(#peripheral.getNames().." available peripherals found:")
     for num,pName in ipairs(peripheral.getNames()) do
-        logfile(num.." available peripherals found:")
         local p = peripheral.wrap(pName)
-        logfile("    "..pName)
         pList[num] = {
             name = pName,
             label = peripheral.getType(pName),
@@ -48,6 +47,7 @@ local function getList()
                 stored = p.getEnergyStored and p.getEnergyStored() or "none"
                 }
             }
+        logfile("    Functions for '"..pName.."' loaded successfully!")
     end
     return pList
 end
@@ -70,11 +70,14 @@ if not http then
 end
 
 -- Load bundled APIs
+logfile("Reloading APIs")
+os.unloadAPI("settings")
 os.loadAPI("settings")
+os.unloadAPI("gui")
 os.loadAPI("gui")
+logfile("Reloaded APIS successfully!")
 
 ----------------
 -- DEBUG CODE --
 ----------------
-getList()
 gui.drawScreen(getList())

@@ -76,7 +76,7 @@ else
                     file.close()
                     logfile("    Downloaded!")
                 elseif new_settings[filename].version > settings[filename].version then
-                    logfile("    Newer version found for ,"..filename.."'.\n        Current version: "..settings[filename].version.."\n        New version: "..new_settings[filename].version)
+                    logfile("    Newer version found for '"..filename.."'.\n        Current version: "..settings[filename].version.."\n        New version: "..new_settings[filename].version)
                     local file = fs.open(filename, "w")
                     file.write(content)
                     file.close()
