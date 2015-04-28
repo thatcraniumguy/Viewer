@@ -7,12 +7,12 @@ local function logfile(input)
         fs.mkdir("/logs")
     else
         local file = fs.open("/logs/viewer.log", "a")
-        file.write(input)
+        file.write("[Main] "..input.."\n")
         file.close()
     end
 end
 
-function getSettings()
+local function getSettings()
     -- Retrieve settings from saved file, or if none exists, create settings from default list
     if not fs.exists("settings") then
         -- Retrieve up to date settings from GitHub
@@ -27,28 +27,29 @@ function getSettings()
     logfile("Main settings loaded")
 end
 
-function getList()
-    pList = {}
+local function getList()
+    local pList = {}
     for num,pName in ipairs(peripheral.getNames()) do
         logfile(num.." available peripherals found:")
         local p = peripheral.wrap(pName)
-        logfile(pName)
+        logfile("    "..pName)
         pList[num] = {
             name = pName,
             label = peripheral.getType(pName),
             methods = p.listMethods(),
-            fluids = p.getTankInfo(),
+            fluids = p.getTankInfo and p.getTankInfo("unknown") or "none",
             inventory = {
-                name = p.getInventoryName(),
-                max = p.getInventorySize(),
-                stored = p.getAllStacks()
+                name = p.getInventoryName and p.getInventoryName() or "none",
+                max = p.getInventorySize and p.getInventorySize() or "none",
+                stored = p.getAllStacks and p.getAllStacks() or "none"
                 },
             energy = {
-                max = p.getMaxEnergyStored(),
-                stored = p.getEnergyStored()
+                max = p.getMaxEnergyStored and p.getMaxEnergyStored() or "none",
+                stored = p.getEnergyStored and p.getEnergyStored() or "none"
                 }
             }
     end
+    return pList
 end
 -------------------------
 -- Main code execution --
@@ -76,3 +77,4 @@ os.loadAPI("gui")
 -- DEBUG CODE --
 ----------------
 getList()
+gui.drawScreen(getList())

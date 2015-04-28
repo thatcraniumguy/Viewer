@@ -3,16 +3,21 @@
 
 
 main = {
-    version = 0.01,
+    version = 0.02,
     safeShutdown = false
     }
 gui = {
-    version = 0.01,
+    version = 0.02,
     menuBarColor = colors.red,
-    menuTextColor = colors.blue,
-    menuLocation = "top",
+    menuTextColor = colors.orange,
+    menuLocation = "bottom",
+    infoBarColor = colors.red,
+    infoTextColor = colors.orange,
     backgroundColor = colors.black,
-    textColor = colors.white
+    textColor = colors.white,
+    tuiColor = colors.yellow,
+    highlightBackgroundColor = colors.white,
+    highlightTextColor = colors.black
     }
 update = {
     version = 0.01

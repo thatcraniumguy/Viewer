@@ -1,27 +1,80 @@
 -- Viewer GUI API
 -- Used for drawing the GUI
 
+function logfile(input)
+    if not fs.exists("/logs") then
+        fs.mkdir("/logs")
+    else
+        local file = fs.open("/logs/viewer.log", "a")
+        file.write("[GUI]  "..input.."\n")
+        file.close()
+    end
+end
+
 function clearScreen()
     -- Clear the current screen, wiping for complete redraw
+    gui.logfile("Unloading old settings in preparation for screen refresh...")
     os.unloadAPI("settings")
     os.loadAPI("settings")
-    term.setBackgroundColor(colors.black)
+    gui.logfile("Settings reloaded!")
+    term.setBackgroundColor(settings.gui.backgroundColor)
     term.clear()
 end
 
 local function drawMenuBar()
-    -- Draw the single line menu bar
-    term.setCursorPos(1,1)
-    term.setBackgroundColor(settings.gui.menuBarColor)
-    for i = 1, xWidth do --NEED TO DEFINE THIS VARIABLE SOMEWHERE
+    -- Draw main title/info bar
+    local termX, termY = term.getSize()
+    term.setCursorPos(1, settings.gui.menuLocation == "top" and termY or 1)
+    term.setBackgroundColor(settings.gui.infoBarColor)
+    term.setTextColor(settings.gui.infoTextColor)
+    for i = 1, termX do
+        term.setCursorPos(i, settings.gui.menuLocation == "top" and termY or 1)
         write(" ")
+    end
+    term.setCursorPos(1, settings.gui.menuLocation == "top" and termY or 1)
+    write("Viewer v"..settings.main.version)
+    term.setCursorPos(termX, 1)
+    write("X")
+    -- Draw menu bar
+    term.setCursorPos(1, settings.gui.menuLocation == "top" and 1 or termY)
+    term.setBackgroundColor(settings.gui.menuBarColor)
+    for i = 1, termX do
+        term.setCursorPos(i, settings.gui.menuLocation == "top" and 1 or termY)
+        write(" ")
+    end
+end
+
+function drawList(list)
+    local termX, termY = term.getSize()
+    term.setCursorPos(1, 2)
+    term.setTextColor(settings.gui.textColor)
+    term.setBackgroundColor(settings.gui.backgroundColor)
+    write("Peripherals Information")
+    term.setTextColor(settings.gui.tuiColor)
+    term.setCursorPos(12, 2)
+    write("|")
+    write(string.rep("-", 11).."+"..string.rep("-", 39))
+    for i = 1, termY - 1 do
+        term.setCursorPos(1, i + 3)
+        -- If there's more peripherals than screen size, then set up a scrollable menu
+        term.setTextColor(settings.gui.textColor)
+        term.setBackgroundColor(settings.gui.backgroundColor)
+        if string.len((list[i] and list[i].label) and list[i].label or "") <= 8 then 
+            write((list[i] and list[i].label) and list[i].label or "")
+        else
+            write((list[i] and list[i].label) and string.sub(list[i].label, 1, 8).."..." or "")
+        end
+        term.setCursorPos(12, i + 3)
+        term.setTextColor(settings.gui.tuiColor)
+        if i < termY - 3 then
+            write("|")
+        end
     end
 end
 
 function drawScreen(list)
     -- Main GUI assembly
-    
-    --clearScreen()
-    --drawMenuBar(list)
-    
+    clearScreen()
+    drawMenuBar()
+    drawList(list)
 end
