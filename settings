@@ -7,7 +7,7 @@ main = {
     safeShutdown = false
     }
 gui = {
-    version = 0.02,
+    version = 0.03,
     menuBarColor = colors.red,
     menuTextColor = colors.orange,
     menuLocation = "bottom",
@@ -17,8 +17,13 @@ gui = {
     textColor = colors.white,
     tuiColor = colors.yellow,
     highlightBackgroundColor = colors.white,
-    highlightTextColor = colors.black
+    highlightTextColor = colors.black,
+    scrollbarColor = colors.black,
+    scrollbarTextColor = colors.gray
     }
 update = {
     version = 0.01
+    }
+settings = {
+    version = 0.03
     }

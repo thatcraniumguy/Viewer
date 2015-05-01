@@ -44,37 +44,113 @@ local function drawMenuBar()
     end
 end
 
-function drawList(list)
+function drawList(list, num)
     local termX, termY = term.getSize()
+    for i = 3, termY - 1 do
+        term.setTextColor(settings.gui.textColor)
+        term.setBackgroundColor(settings.gui.backgroundColor)
+        term.setCursorPos(1, i)
+        write(string.rep(" ", 15))
+    end
     term.setCursorPos(1, 2)
     term.setTextColor(settings.gui.textColor)
     term.setBackgroundColor(settings.gui.backgroundColor)
-    write("Peripherals Information")
+    write("Peripherals    Information")
     term.setTextColor(settings.gui.tuiColor)
-    term.setCursorPos(12, 2)
+    term.setCursorPos(15, 2)
     write("|")
-    write(string.rep("-", 11).."+"..string.rep("-", 39))
-    for i = 1, termY - 1 do
-        term.setCursorPos(1, i + 3)
-        -- If there's more peripherals than screen size, then set up a scrollable menu
-        term.setTextColor(settings.gui.textColor)
-        term.setBackgroundColor(settings.gui.backgroundColor)
-        if string.len((list[i] and list[i].label) and list[i].label or "") <= 8 then 
-            write(list[i] and list[i].label or "")
-        else
-            write(list[i] and string.sub(list[i].label, 1, 8).."..." or "")
-        end
-        term.setCursorPos(12, i + 3)
-        term.setTextColor(settings.gui.tuiColor)
-        if i < termY - 3 then
+    write(string.rep("-", 51))
+    for i = 2, termY - 1 do 
+        term.setCursorPos(15, i)
+        if i == 2 then
+            term.setBackgroundColor(settings.gui.backgroundColor)
+            term.setTextColor(settings.gui.tuiColor)
             write("|")
+        elseif i == 3 then
+            term.setBackgroundColor(settings.gui.backgroundColor)
+            term.setTextColor(settings.gui.tuiColor)
+            write("+")
+        elseif i == 4 then
+            term.setBackgroundColor(settings.gui.scrollbarColor)
+            term.setTextColor(settings.gui.scrollbarTextColor)
+            write("^")
+        elseif i == termY - 1 then
+            term.setBackgroundColor(settings.gui.scrollbarColor)
+            term.setTextColor(settings.gui.scrollbarTextColor)
+            write("v")
+        else
+            term.setBackgroundColor(settings.gui.scrollbarColor)
+            term.setTextColor(settings.gui.scrollbarTextColor)
+            write("|")
+        end
+    end
+    term.setBackgroundColor(settings.gui.menuBarColor)
+    term.setTextColor(settings.gui.menuTextColor)
+    term.setCursorPos(6, settings.gui.menuLocation == "top" and 1 or termY)
+    write(string.rep(" ", 9))
+    term.setCursorPos(1, settings.gui.menuLocation == "top" and 1 or termY)
+    write("Page "..math.ceil(num / 15).."/"..math.ceil(#list / 15))
+    for i = 1, 15 do
+        if #list < 15 then
+            term.setTextColor(settings.gui.textColor)
+            term.setBackgroundColor(settings.gui.backgroundColor)
+            term.setCursorPos(1, i + 3)
+            if string.len((list[i] and list[i].label) and list[i].label or "") > 11 then
+                write(list[i] and string.sub(list[i].label, 1, 11).."..." or "")
+            else
+                write(list[i] and list[i].label or "")
+            end
+            term.setBackgroundColor(settings.gui.highlightBackgroundColor)
+            term.setTextColor(settings.gui.highlightTextColor)
+            term.setCursorPos(1, num + 3)
+            if string.len(list[num].label) > 11 then
+                write(string.sub(list[num].label, 1, 11).."...")
+            else
+                write(list[num].label)
+            end
+         else
+            if num > 15 then
+                term.setTextColor(settings.gui.textColor)
+                term.setBackgroundColor(settings.gui.backgroundColor)
+                term.setCursorPos(1, i + 3)
+                if string.len((list[i + 15] and list[i + 15].label) and list[i + 15].label or "") > 11 then
+                    write(list[i + 15] and string.sub(list[i + 15].label, 1, 11).."..." or "")
+                else
+                    write(list[i + 15] and list[i + 15].label or "")
+                end
+                term.setBackgroundColor(settings.gui.highlightBackgroundColor)
+                term.setTextColor(settings.gui.highlightTextColor)
+                term.setCursorPos(1, num - 12)
+                if string.len(list[num].label) > 11 then
+                    write(string.sub(list[num].label, 1, 11).."...")
+                else
+                    write(list[num].label)
+                end
+            else
+                term.setTextColor(settings.gui.textColor)
+                term.setBackgroundColor(settings.gui.backgroundColor)
+                term.setCursorPos(1, i > 15 and (i - 12) or (i + 3))
+                if string.len((list[i] and list[i].label) and list[i].label or "") > 11 then
+                    write(list[i] and string.sub(list[i].label, 1, 11).."..." or "")
+                else
+                    write(list[i] and list[i].label or "")
+                end
+                term.setBackgroundColor(settings.gui.highlightBackgroundColor)
+                term.setTextColor(settings.gui.highlightTextColor)
+                term.setCursorPos(1, num + 3)
+                if string.len(list[num].label) > 11 then
+                    write(string.sub(list[num].label, 1, 11).."...")
+                else
+                    write(list[num].label)
+                end
+            end
         end
     end
 end
 
-function drawScreen(list)
+function drawScreen(list, num)
     -- Main GUI assembly
     clearScreen()
     drawMenuBar()
-    drawList(list)
+    drawList(list, num)
 end
