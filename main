@@ -4,7 +4,7 @@
 -- Debug tool
 local function logfile(input)
     if not fs.exists("/logs") then
-        fs.mkdir("/logs")
+        fs.makeDir("/logs")
     else
         local file = fs.open("/logs/viewer.log", "a")
         file.write("[Main] "..input.."\n")
@@ -75,7 +75,7 @@ os.unloadAPI("settings")
 os.loadAPI("settings")
 os.unloadAPI("gui")
 os.loadAPI("gui")
-logfile("Reloaded APIS successfully!")
+logfile("Reloaded APIs successfully!")
 
 ----------------
 -- DEBUG CODE --

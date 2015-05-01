@@ -3,7 +3,7 @@
 
 function logfile(input)
     if not fs.exists("/logs") then
-        fs.mkdir("/logs")
+        fs.makeDir("/logs")
     else
         local file = fs.open("/logs/viewer.log", "a")
         file.write("[GUI]  "..input.."\n")
@@ -60,9 +60,9 @@ function drawList(list)
         term.setTextColor(settings.gui.textColor)
         term.setBackgroundColor(settings.gui.backgroundColor)
         if string.len((list[i] and list[i].label) and list[i].label or "") <= 8 then 
-            write((list[i] and list[i].label) and list[i].label or "")
+            write(list[i] and list[i].label or "")
         else
-            write((list[i] and list[i].label) and string.sub(list[i].label, 1, 8).."..." or "")
+            write(list[i] and string.sub(list[i].label, 1, 8).."..." or "")
         end
         term.setCursorPos(12, i + 3)
         term.setTextColor(settings.gui.tuiColor)
