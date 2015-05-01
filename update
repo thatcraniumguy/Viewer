@@ -26,9 +26,10 @@ local files = {
     "main",
     "gui",
     "update",
-    --"settings",
+    "settings",
     }
 
+local args = {...}
 logfile("Updater started, checking for updates for "..#files.." files")
 if not http then
     logfile("HTTP API not enabled! Please enable the HTTP API in the ComputerCraft config file, or ask your server administrator to do so.")
@@ -52,8 +53,12 @@ else
     end
     logfile("Loading settings into API")
     os.loadAPI("settings")
-    if filename ~= "settings" then
+    if args[1] == nil then
         for i,filename in pairs(files) do
+            sleep(0)
+            if filename == "settings" then
+                -- Load current settings, download update, then try to merge them somehow
+            end
             logfile("Checking for updates for '"..filename.."':")
             local site = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename)
             local content = site.readAll()
@@ -68,7 +73,7 @@ else
                 tempFile.write(tempSite)
                 tempFile.close()
                 os.loadAPI("/temp/new_settings")
-                print(new_settings[filename].version.."->"..settings[filename].version)
+                print("Current version for '"..filename.."': "..settings[filename].version.."\n    Updated version: "..new_settings[filename].version)
                 if not fs.exists(filename) then
                     logfile("    No file found for '"..filename.."'!\n    Downloading file now...")
                     local file = fs.open(filename, "w")
@@ -80,14 +85,31 @@ else
                     local file = fs.open(filename, "w")
                     file.write(content)
                     file.close()
+                    print("    Updated!")
                     logfile("    Updated!")
                 else
+                    print("    Skipping...")
                     logfile("    No new version found for '"..filename.."', skipping.")
                 end
             end
         end
-    else
-        -- Load current settings, download update, then try to merge them somehow
+    elseif args[1] == "--force" or args[1] == "-f" then
+        logfile("Forcing update of all files")
+        for i, filename in pairs(files) do
+            local site = http.get("https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename)
+            local content = site.readAll()
+            if not content then 
+                logfile("    No response from GitHub. Please check the ComputerCraft config and ensure that the GitHub url has been whitelisted.")
+                print("No response from GitHub. Please check the\nComputerCraft config and ensure that the GitHub url\nhas been whitelisted.")
+                return
+            else
+                logfile("    Retrieved file from https://raw.githubusercontent.com/thatcraniumguy/Viewer/master/"..filename)
+                local file = fs.open(filename, "w")
+                file.write(content)
+                file.close()
+                logfile("    Downloaded!")
+            end
+        end
     end
 end
 logfile("Updater completed checking for updates")
