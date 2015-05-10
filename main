@@ -35,7 +35,7 @@ local function getList()
         pList[num] = {
             name = pName,
             label = peripheral.getType(pName),
-            methods = p.listMethods(),
+            methods = p.listMethods and p.listMethods() or "unknown",
             fluids = p.getTankInfo and p.getTankInfo("unknown") or "none",
             inventory = {
                 name = p.getInventoryName and p.getInventoryName() or "none",
@@ -45,6 +45,17 @@ local function getList()
             energy = {
                 max = p.getMaxEnergyStored and p.getMaxEnergyStored() or "none",
                 stored = p.getEnergyStored and p.getEnergyStored() or "none"
+                disk = p.getType(pName) == "disk" and {
+                    label = p.getLabel(),
+                    id = p.getID(),
+                    isPresent = p.isPresent(),
+                    hasData = p.hasData(),
+                    hasAudio = p.hasAudio(),
+                    songTitle = p.hasAudio() and p.getAudioTitle() or "none"
+                    } or "none"
+                -- Need to test if I can get file info from other computers, or at least from drives with floppies
+                -- 
+                -- 
                 }
             }
         logfile("    Functions for '"..pName.."' loaded successfully!")
