@@ -1,5 +1,5 @@
 -- Viewer settings file
--- Do not alter these settings manually, they should be edited only in the application
+-- Do not alter these settings manually, they should only be edited in the application
 
 
 main = {

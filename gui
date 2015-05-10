@@ -148,9 +148,23 @@ function drawList(list, num)
     end
 end
 
+function drawInfo(list, num, page)
+    term.setCursorPos(17, 4)
+    term.setTextColor(settings.gui.textColor)
+    term.setBackgroundColor(settings.gui.backgroundColor)
+    write("Peripheral network location: "..list[num] and list[num].name.."\n")
+    write("Peripheral type: "..list[num] and list[num].label)
+    -- Construct the page info
+    -- When listing the methods, use string.gsub to iterate through and replace the commas with "\n"
+    -- Each list item apart from the name and label should be a page of its own
+    -- I can''t do any more with this until I can look up some docs again
+    -- Menu bar should show "Commands" that can be clicked on in order to execute some of those peripheral commands. Would require use of pcall due to likely errors.
+end
+
 function drawScreen(list, num)
     -- Main GUI assembly
     clearScreen()
     drawMenuBar()
     drawList(list, num)
+    drawInfo(list, num, page)
 end
