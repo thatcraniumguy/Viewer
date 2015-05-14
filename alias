@@ -2,6 +2,8 @@
 -- This file contains the default English aliases for various peripherals. It would be periodically updated as additional peripherals are defined.
 
 modem = "Modem"
+tile_thermalexpansion_machine_furnace_name = "Redstone Furnace"
+tile_thermalexpansion_machine_crucible_name = "Magma Crucible"
 tile_thermalexpansion_device_breaker_name = "Terrain Smasher"
 tile_thermalexpansion_strongbox_reinforced_name = "Reinforced Strongbox"
 tile_thermalexpansion_cell_basic_name = "Leadstone Energy Cell"
