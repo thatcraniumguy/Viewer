@@ -33,8 +33,6 @@ local function drawMenuBar()
     end
     term.setCursorPos(1, settings.gui.menuLocation == "top" and termY or 1)
     write("Viewer v"..settings.main.version)
-    term.setCursorPos(termX, 1)
-    write("X")
     -- Draw menu bar
     term.setCursorPos(1, settings.gui.menuLocation == "top" and 1 or termY)
     term.setBackgroundColor(settings.gui.menuBarColor)
@@ -42,6 +40,8 @@ local function drawMenuBar()
         term.setCursorPos(i, settings.gui.menuLocation == "top" and 1 or termY)
         write(" ")
     end
+    term.setCursorPos(termX, 1)
+    write("X")
 end
 
 function drawList(list, num)
@@ -55,7 +55,7 @@ function drawList(list, num)
     term.setCursorPos(1, 2)
     term.setTextColor(settings.gui.textColor)
     term.setBackgroundColor(settings.gui.backgroundColor)
-    write("Peripherals    Information")
+    write("Peripherals     Information")
     term.setTextColor(settings.gui.tuiColor)
     term.setCursorPos(15, 2)
     write("|")
@@ -149,19 +149,59 @@ function drawList(list, num)
 end
 
 function drawInfo(list, num, page)
+    local termX, termY = term.getSize()
+    term.setCursorPos(17, settings.gui.menuLocation == "top" and 1 or termY)
+    term.setBackgroundColor(settings.gui.menuBarColor)
+    term.setTextColor(settings.gui.menuTextColor)
+    write("Page: "..string.upper(string.sub(page, 1, 1))..string.sub(page, 2))
     term.setCursorPos(17, 4)
     term.setTextColor(settings.gui.textColor)
     term.setBackgroundColor(settings.gui.backgroundColor)
-    write("Peripheral network location: "..list[num] and list[num].name.."\n")
-    write("Peripheral type: "..list[num] and list[num].label)
+    if string.len(list[num].name) <= 24 then --24 max
+        write("Location: "..list[num].name)
+    else
+        write("Location: "..string.sub(list[num].name, 1, 21).."...")
+    end
+    term.setCursorPos(17, 5)
+    if alias[list[num].label] ~= nil and string.len(alias[list[num].label]) <= 28 then --28 max
+        write("Type: "..alias[list[num].label])
+    elseif string.len(list[num].label) <= 28 then
+        write("Type: "..list[num].label)
+    else
+        write("Type: "..string.sub((alias[list[num].label] or list[num].label), 1, 25).."...")
+    end
+    if type(list[num][page]) == "table" then
+        local pNum = 1
+        for i, v in pairs(list[num][page]) do
+            term.setCursorPos(17, 6 + pNum)
+            write(string.upper(string.sub(i, 1, 1))..string.sub(i, 2)..": ")
+            if type(v) == "table" then
+                if string.len(i..": "..textutils.serialize(v)) <= 34 then -- 34 max
+                    write(textutils.serialize(v))
+                else
+                    write("View data in new page")
+                    -- Find some way to either view the data on this, or dump info to a file
+                    -- Need to add a way to handle inventory data or additional nested tables
+                end
+            else
+                if string.len(i..": "..v) <= 34 then -- 34 max
+                    write(v)
+                else
+                    write(string.sub(v, 1, 31 - string.len(i..": ")).."...")
+                end
+            end
+            pNum = pNum + 1
+        end
+    end
+    -- Need to find a way to list the information per page
+    -- A bit annoying to do this, considering how I construct the list table
     -- Construct the page info
     -- When listing the methods, use string.gsub to iterate through and replace the commas with "\n"
     -- Each list item apart from the name and label should be a page of its own
-    -- I can''t do any more with this until I can look up some docs again
     -- Menu bar should show "Commands" that can be clicked on in order to execute some of those peripheral commands. Would require use of pcall due to likely errors.
 end
 
-function drawScreen(list, num)
+function drawScreen(list, num, page)
     -- Main GUI assembly
     clearScreen()
     drawMenuBar()

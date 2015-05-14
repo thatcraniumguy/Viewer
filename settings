@@ -3,14 +3,14 @@
 
 
 main = {
-    version = 0.02,
+    version = 0.03,
     safeShutdown = false
     }
 gui = {
-    version = 0.03,
+    version = 0.04,
     menuBarColor = colors.red,
     menuTextColor = colors.orange,
-    menuLocation = "bottom",
+    menuLocation = "top",
     infoBarColor = colors.red,
     infoTextColor = colors.orange,
     backgroundColor = colors.black,
@@ -22,8 +22,11 @@ gui = {
     scrollbarTextColor = colors.gray
     }
 update = {
-    version = 0.02
+    version = 0.03
     }
 settings = {
-    version = 0.03
+    version = 0.04
+    }
+alias = {
+    version = 0.01
     }
