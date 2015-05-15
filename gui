@@ -174,7 +174,9 @@ function drawInfo(list, num, page)
         local pNum = 1
         for i, v in pairs(list[num][page]) do
             term.setCursorPos(17, 6 + pNum)
-            write(string.upper(string.sub(i, 1, 1))..string.sub(i, 2)..": ")
+            local opt = string.upper(string.sub(i, 1, 1))..string.sub(i, 2)..": "
+            write(string.gsub(opt, "_", " "))
+            --write(string.upper(string.sub(i, 1, 1))..string.sub(i, 2)..": ")
             if type(v) == "table" then
                 if string.len(i..": "..textutils.serialize(v)) <= 34 then -- 34 max
                     write(textutils.serialize(v))

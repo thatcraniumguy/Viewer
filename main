@@ -43,9 +43,10 @@ local function getList()
             methods = p.listMethods and p.listMethods() or "unknown",
             fluids = p.getTankInfo and p.getTankInfo("unknown") or "none",
             inventory = p.getInventoryName and {
-                name = p.getInventoryName and p.getInventoryName() or "none",
-                max = p.getInventorySize and p.getInventorySize() or "none",
-                stored = p.getAllStacks and p.getAllStacks() or "none"
+                inventory_name = p.getInventoryName and p.getInventoryName() or "none",
+                max_slots = p.getInventorySize and p.getInventorySize() or "none",
+                slots_used = p.getAllStacks and (function() local count = 0 for _ in pairs(p.getAllStacks()) do count = count + 1 end return count end)() or "none",
+                items_stored = p.getAllStacks and p.getAllStacks() or "none"
                 } or "none",
             energy = p.getEnergyStored and {
                 max = p.getMaxEnergyStored() or "none",
@@ -97,7 +98,6 @@ logfile("Reloaded APIs successfully!")
 ----------------
 local list = getList()
 local num = 2 --math.random(1, #list)
-local page = list[num].energy
 local pages = {
 "fluids",
 "inventory",
