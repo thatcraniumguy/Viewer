@@ -70,7 +70,7 @@ end
 -------------------------
 -- Variables
 local pages = {
-"none",
+"general",
 "fluids",
 "inventory",
 "energy",
