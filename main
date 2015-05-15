@@ -68,6 +68,15 @@ end
 -------------------------
 -- Main code execution --
 -------------------------
+-- Variables
+local pages = {
+"fluids",
+"inventory",
+"energy",
+"disk"
+}
+local num = 1
+local pageNum = 1
 -- Clear log files
 if not fs.exists("/logs") then
     fs.mkdir("/logs")
@@ -82,7 +91,6 @@ if not http then
     print("HTTP API not enabled! Please enable the HTTP API in\nthe ComputerCraft config file, or ask your server/nadministrator to do so.")
     return
 end
-
 -- Load bundled APIs
 logfile("Reloading APIs")
 os.unloadAPI("settings")
@@ -92,16 +100,43 @@ os.loadAPI("alias")
 os.unloadAPI("gui")
 os.loadAPI("gui")
 logfile("Reloaded APIs successfully!")
-
+-- Main execution loop
+while true do
+    local termX, termY = term.getSize()
+    local list = getList()
+    gui.drawScreen(list, num, pages[pageNum])
+    local events = {os.pullEvent()}
+    -- Check for peripheral attach/detach events
+    if events[1] == "peripheral" then
+        local pName = events[2]
+        logfile("Peripheral addition detected.")
+        logfile("Peripheral added: "..pName)
+        logfile("Peripheral type: "..peripheral.getType(pName))
+    elseif events[1] == "peripheral_detach" then
+        local pName = events[2]
+        logfile("Peripheral removal detected.")
+        logfile("Peripheral removed: "..pName)
+    elseif events[1] == "mouse_click" then
+        -- Check location of mouse click, and act accordingly
+        -- Organized by X coord search first, then Y
+        if events[2] == 1 then
+            -- Left click
+            if events[3] == termX and events[4] == 1 then
+                -- Close program
+                gui.drawPopup({"Thank you for using Viewer", "Please feel free to make any suggestions on my Github page", "https://github.com/thatcraniumguy/"})
+                return
+            elseif events[3] >= 1 and events[3] <= 14 then
+                -- mouse x == 1 through 14
+                
+            else
+            
+            end
+        elseif events[2] == 2 then
+            -- Right click
+        end
+    else
+    end
+end
 ----------------
 -- DEBUG CODE --
 ----------------
-local list = getList()
-local num = 2 --math.random(1, #list)
-local pages = {
-"fluids",
-"inventory",
-"energy",
-"disk"
-}
-gui.drawScreen(list, num, pages[2])
