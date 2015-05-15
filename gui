@@ -203,6 +203,10 @@ function drawInfo(list, num, page)
     -- Menu bar should show "Commands" that can be clicked on in order to execute some of those peripheral commands. Would require use of pcall due to likely errors.
 end
 
+function drawPopup(text)
+
+end
+
 function drawScreen(list, num, page)
     -- Main GUI assembly
     clearScreen()
