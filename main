@@ -78,6 +78,7 @@ local pages = {
 }
 local num = 1
 local pageNum = 1
+local popup = false
 -- Clear log files
 if not fs.exists("/logs") then
     fs.mkdir("/logs")
@@ -119,18 +120,34 @@ while true do
         logfile("Peripheral removed: "..pName)
     elseif events[1] == "mouse_click" then
         -- Check location of mouse click, and act accordingly
-        -- Organized by X coord search first, then Y
         if events[2] == 1 then
             -- Left click
             if events[3] == termX and events[4] == 1 then
                 -- Close program
-                gui.drawPopup({"Thank you for using Viewer", "Please feel free to make any suggestions on my Github page", "https://github.com/thatcraniumguy/"})
+                gui.drawPopup({"INFO", "Thank you for using Viewer", "Please feel free to view my Github page", "https://github.com/thatcraniumguy/"})
+                popup = true
+                term.setCursorPos(1,1)
+                term.setTextColor(colors.white)
+                term.setBackgroundColor(colors.black)
+                term.clear()
                 return
-            elseif events[3] >= 1 and events[3] <= 14 then
-                -- mouse x == 1 through 14
-                
+            elseif events[3] >= 1 and events[3] <= 14 and events[4] >= 4 and events[4] <= termY - 1 then
+                -- Peripheral selection
+                selection = (events[4] - 3)
+                if selection > #list then
+                    -- Skip number change
+                else
+                    -- Change number
+                    num = selection
+                end
+            elseif events[3] >= 23 and events[3] <= (16 + string.len("Page: "..pages[pageNum])) then
+                local menu = (settings.gui.menuLocation == "top") and 1 or termY
+                if events[4] == menu then
+                    print(events[3].."-"..(16 + string.len("Page: "..pages[pageNum])))
+                    print("Change page")
+                end
             else
-            
+                
             end
         elseif events[2] == 2 then
             -- Right click
