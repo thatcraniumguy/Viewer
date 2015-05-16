@@ -1,13 +1,12 @@
 -- Viewer settings file
 -- Do not alter these settings manually, they should only be edited in the application
 
-
 main = {
-    version = 0.04,
+    version = 0.05,
     safeShutdown = false
     }
 gui = {
-    version = 0.05,
+    version = 0.06,
     menuBarColor = colors.red,
     menuTextColor = colors.orange,
     menuLocation = "top",
@@ -29,7 +28,7 @@ update = {
     version = 0.03
     }
 settings = {
-    version = 0.05
+    version = 0.06
     }
 alias = {
     version = 0.01
