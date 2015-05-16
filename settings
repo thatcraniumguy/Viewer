@@ -3,11 +3,11 @@
 
 
 main = {
-    version = 0.03,
+    version = 0.04,
     safeShutdown = false
     }
 gui = {
-    version = 0.04,
+    version = 0.05,
     menuBarColor = colors.red,
     menuTextColor = colors.orange,
     menuLocation = "top",
@@ -19,13 +19,17 @@ gui = {
     highlightBackgroundColor = colors.white,
     highlightTextColor = colors.black,
     scrollbarColor = colors.black,
-    scrollbarTextColor = colors.gray
+    scrollbarTextColor = colors.gray,
+    popupBackground = colors.white,
+    popupText = colors.black,
+    popupTitleBackground = colors.lightGray,
+    popupTitleText = colors.black
     }
 update = {
     version = 0.03
     }
 settings = {
-    version = 0.04
+    version = 0.05
     }
 alias = {
     version = 0.01
