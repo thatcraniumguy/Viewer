@@ -148,7 +148,7 @@ function drawList(list, num)
     end
 end
 
-function drawInfo(list, num, page)
+function drawInfo(list, num, page, fluidNum)
     local termX, termY = term.getSize()
     term.setCursorPos(17, settings.gui.menuLocation == "top" and 1 or termY)
     term.setBackgroundColor(settings.gui.menuBarColor)
@@ -160,7 +160,7 @@ function drawInfo(list, num, page)
     if string.len(list[num].name) <= 24 then --24 max
         write("Location: "..list[num].name)
     else
-        write("Location: "..string.sub(list[num].name, 1, 21).."...")
+        write("Location: "..string.sub(list[num].name, 1, 22).."...")
     end
     term.setCursorPos(17, 5)
     if alias[list[num].label] ~= nil and string.len(alias[list[num].label]) <= 28 then --28 max
@@ -171,30 +171,63 @@ function drawInfo(list, num, page)
         write("Type: "..string.sub((alias[list[num].label] or list[num].label), 1, 25).."...")
     end
     if type(list[num][page]) == "table" then
-        local pNum = 1
+        local iNum = 1
+        term.setCursorPos(17, 6 + iNum)
+        write(page == "fluids" and ("Fluids: "..#list[num][page]) or "")
         for i, v in pairs(list[num][page]) do
-            term.setCursorPos(17, 6 + pNum)
+            term.setCursorPos(17, 6 + iNum)
             local opt = string.upper(string.sub(i, 1, 1))..string.sub(i, 2)..": "
-            write(string.gsub(opt, "_", " "))
             if type(v) == "table" then
-                if string.len(i..": "..textutils.serialize(v)) <= 34 then -- 34 max
+                if page == "fluids" then
+                    term.setCursorPos(17, 6 + 2)
+                    write("Selected: "..list[num][page][fluidNum].contents.rawName)
+                    local aNum = 1
+                    for a, b in pairs(list[num][page][fluidNum]) do
+                        if type(list[num][page][fluidNum][a]) == "table" then
+                            term.setCursorPos(17, 6 + 2 + aNum)
+                            write(string.upper(string.sub(a, 1, 1))..string.sub(a, 2)..": ")
+                            local cNum = 1
+                            for c, d in pairs(list[num][page][fluidNum][a]) do
+                                term.setCursorPos(19, 6 + 2 + aNum + cNum)
+                                write(string.upper(string.sub(c, 1, 1))..string.sub(c, 2)..": "..d)
+                                cNum = cNum + 1
+                            end
+                        else--if type(list[num][page][1][a]) == "string" then
+                            term.setCursorPos(17, 6 + 2 + aNum)
+                            write(string.upper(string.sub(a, 1, 1))..string.sub(a, 2)..": "..b)
+                        end
+                        aNum = aNum + 1
+                    end
+                elseif string.len(i..": "..textutils.serialize(v)) <= 34 then -- 34 max
+                    write(string.gsub(opt, "_", " "))
                     write(textutils.serialize(v))
                 else
-                    write("View data in new page")
+                    write(string.gsub(opt, "_", " "))
+                    write("View in new page")
                     -- Find some way to either view the data on this, or dump info to a file
                     -- Need to add a way to handle inventory data or additional nested tables
                 end
             else
-                if string.len(i..": "..v) <= 34 then -- 34 max
+                if string.len(opt..v) <= 34 then -- 34 max
+                    write(string.gsub(opt, "_", " "))
                     write(v)
                 else
-                    write("View data in new page")
+                    write(string.gsub(opt, "_", " "))
+                    write(string.sub(v, 1, 31 - #opt).."...")
+                    -- Find some way to either view the data on this, or dump info to a file
+                    -- Need to add a way to handle inventory data or additional nested tables
                 end
             end
-            pNum = pNum + 1
+            iNum = iNum + 1
         end
     else
-        --write(type(list[num][page]))
+        term.setCursorPos(17, 7)
+        local opt = string.upper(string.sub(page, 1, 1))..string.sub(page, 2)..": "
+        if list[num][page] then
+            write(opt..list[num][page])
+        else
+            -- No info to display
+        end
     end
     -- Need to find a way to list the information per page
     -- A bit annoying to do this, considering how I construct the list table
@@ -204,7 +237,7 @@ function drawInfo(list, num, page)
     -- Menu bar should show "Commands" that can be clicked on in order to execute some of those peripheral commands. Would require use of pcall due to likely errors.
 end
 
-function drawPopup(text)
+function drawPopup(text, opt)
     local termX, termY = term.getSize()
     -- Determine max text width
     local maxWidth = 1
@@ -241,35 +274,36 @@ function drawPopup(text)
         term.setCursorPos(textStart, i == 1 and startY or (startY + i))
         term.setBackgroundColor(i == 1 and settings.gui.popupTitleBackground or settings.gui.popupBackground)
         term.setTextColor(i == 1 and settings.gui.popupTitleText or settings.gui.popupText)
-        write(text[i])
+        write(string.upper(string.sub(text[i], 1, 1))..string.sub(text[i], 2))
     end
     while true do
         local events = {os.pullEvent()}
         if events[1] == "mouse_click" and events[2] == 1 then
             if events[3] == endX and events[4] == startY then
                 -- Close popup window
-                break
-            end
-            for i = 1, #text do
-                local textStart = (termX / 2) - (#text[i] / 2) + 1
-                local textEnd = textStart + #text[i]
-                if events[3] >= textStart and events[4] <= textEnd then
-                    -- Select option
-                    opt = text[i + 2]
-                    break
+                return opt
+            else
+                for i = 1, #text do
+                    local textStart = (termX / 2) - (#text[i] / 2) + 1
+                    local textEnd = textStart + #text[i]
+                    textY = startY + 1 + i
+                    if events[3] >= textStart and events[3] <= textEnd and events[4] == textY then
+                        -- Select option
+                        local opt = text[i + 1]
+                        return opt
+                    end
                 end
             end
         else
             -- Repeat until option selected
         end
     end
-    return opt
 end
 
-function drawScreen(list, num, page)
+function drawScreen(list, num, page, fluidNum)
     -- Main GUI assembly
     clearScreen()
     drawMenuBar()
     drawList(list, num)
-    drawInfo(list, num, page)
+    drawInfo(list, num, page, fluidNum)
 end

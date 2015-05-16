@@ -52,13 +52,13 @@ local function getList()
                 max = p.getMaxEnergyStored() or "none",
                 stored = p.getEnergyStored() or "none"
                 } or "none",
-            disk = (peripheral.getType(pName) == "disk") and {
-                    label = p.getLabel(),
-                    id = p.getID(),
-                    isPresent = p.isPresent(),
-                    hasData = p.hasData(),
-                    hasAudio = p.hasAudio(),
-                    songTitle = p.hasAudio() and p.getAudioTitle() or "none"
+            disk = (peripheral.getType(pName) == "drive") and {
+                    label = disk.getLabel(pName),
+                    id = (disk.getID(pName) ~= nil) and disk.getID(pName) or "none",
+                    is_present = tostring(disk.isPresent(pName)),
+                    has_data = (disk.hasData(pName) ~= nil) and tostring(disk.hasData(pName)) or "false",
+                    has_audio = disk.hasAudio(pName) and "true" or "false",
+                    song_title = disk.hasAudio(pName) and disk.getAudioTitle(pName) or "none"
                 } or "none"
             }
         logfile("    Functions for '"..pName.."' loaded successfully!")
@@ -77,7 +77,8 @@ local pages = {
 "disk"
 }
 local num = 1
-local pageNum = 1
+local fluidNum = 1
+local page = pages[1]
 local popup = false
 -- Clear log files
 if not fs.exists("/logs") then
@@ -106,7 +107,8 @@ logfile("Reloaded APIs successfully!")
 while true do
     local termX, termY = term.getSize()
     local list = getList()
-    gui.drawScreen(list, num, pages[pageNum])
+    local menu = (settings.gui.menuLocation == "top") and 1 or termY
+    gui.drawScreen(list, num, page, fluidNum)
     local events = {os.pullEvent()}
     -- Check for peripheral attach/detach events
     if events[1] == "peripheral" then
@@ -119,13 +121,21 @@ while true do
         logfile("Peripheral removal detected.")
         logfile("Peripheral removed: "..pName)
     elseif events[1] == "mouse_click" then
+        -- Debug for mouse click position
+        term.setBackgroundColor(settings.gui.menuBarColor)
+        term.setTextColor(settings.gui.menuTextColor)
+        term.setCursorPos(termX - string.len(events[3].."x, "..events[4].."y"), settings.gui.menuLocation == "top" and termY or 1)
+        write(events[3].."x, "..events[4].."y")
+        term.setBackgroundColor(colors.black)
+        -- Debug for mouse click position
+        
         -- Check location of mouse click, and act accordingly
         if events[2] == 1 then
             -- Left click
             if events[3] == termX and events[4] == 1 then
                 -- Close program
+                local opt = ""
                 gui.drawPopup({"INFO", "Thank you for using Viewer", "Please feel free to view my Github page", "https://github.com/thatcraniumguy/"})
-                popup = true
                 term.setCursorPos(1,1)
                 term.setTextColor(colors.white)
                 term.setBackgroundColor(colors.black)
@@ -140,14 +150,30 @@ while true do
                     -- Change number
                     num = selection
                 end
-            elseif events[3] >= 23 and events[3] <= (16 + string.len("Page: "..pages[pageNum])) then
-                local menu = (settings.gui.menuLocation == "top") and 1 or termY
-                if events[4] == menu then
-                    print(events[3].."-"..(16 + string.len("Page: "..pages[pageNum])))
-                    print("Change page")
+            elseif events[3] >= 23 and events[3] <= (16 + string.len("Page: "..page)) and events[4] == menu then
+                -- Change info section page
+                local popupTable = pages
+                local opt = page
+                table.insert(popupTable, 1, "Information page ")
+                page = gui.drawPopup(popupTable, opt)
+                table.remove(popupTable, 1)
+            elseif page == "fluids" and list[num][page][fluidNum] then
+                if events[3] >= 27 and events[3] <= (string.len(list[num][page][fluidNum].contents.rawName) + 26) and events[4] == 8 then
+                    -- Change fluid number page if needed
+                    local fluidOpts = {"Selected "}
+                    for i = 1, #list[num][page] do
+                        table.insert(fluidOpts, i + 1, list[num][page][i].contents.rawName)
+                    end
+                    fluidNum = gui.drawPopup(fluidOpts, fluidNum)
+                    for i = 1, #list[num][page] do
+                        if list[num][page][i].contents.rawName == fluidNum then
+                            fluidNum = i
+                            break
+                        end
+                    end
                 end
             else
-                
+                -- Repeat loop
             end
         elseif events[2] == 2 then
             -- Right click
