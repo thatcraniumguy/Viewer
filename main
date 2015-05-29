@@ -103,20 +103,23 @@ os.loadAPI("alias")
 os.unloadAPI("gui")
 os.loadAPI("gui")
 logfile("Reloaded APIs successfully!")
+-- Get list of attached peripherals
+local list = getList()
 -- Main execution loop
 while true do
     local termX, termY = term.getSize()
-    local list = getList()
     local menu = (settings.gui.menuLocation == "top") and 1 or termY
     gui.drawScreen(list, num, page, fluidNum)
     local events = {os.pullEvent()}
     -- Check for peripheral attach/detach events
     if events[1] == "peripheral" then
+        list = getList()
         local pName = events[2]
         logfile("Peripheral addition detected.")
         logfile("Peripheral added: "..pName)
         logfile("Peripheral type: "..peripheral.getType(pName))
     elseif events[1] == "peripheral_detach" then
+        list = getList()
         local pName = events[2]
         logfile("Peripheral removal detected.")
         logfile("Peripheral removed: "..pName)
