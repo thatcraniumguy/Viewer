@@ -196,6 +196,19 @@ while true do
         elseif num < 1 then
             num = 1
         end
+    elseif events[1] == "key" then
+        -- Handle keypresses
+        if events[2] == 200 then
+            num = num - 1
+        elseif events[2] == 208
+            num = num + 1
+        end
+        -- If the number is higher or lower than the list of peripherals, then return it to the end or start
+        if num > #list then
+            num = #list
+        elseif num < 1 then
+            num = 1
+        end
     else
         -- Ignore remaining events
     end
