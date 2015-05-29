@@ -181,7 +181,23 @@ while true do
         elseif events[2] == 2 then
             -- Right click
         end
+    elseif events[1] == "mouse_scroll" then
+        -- Mouse scrolled
+        if events[4] == 1 then
+            -- Up
+            num = num - 1
+        elseif events[4] == -1 then
+            -- Down
+            num = num + 1
+        end
+        -- If the number is higher or lower than the list of peripherals, then return it to the end or start
+        if num > #list then
+            num = #list
+        elseif num < 1 then
+            num = 1
+        end
     else
+        -- Ignore remaining events
     end
 end
 ----------------
